@@ -11,6 +11,38 @@ import platform
 from sklearn.model_selection import train_test_split
 from xgboost import XGBRegressor
 from sklearn.metrics import r2_score
+import os
+import matplotlib.font_manager as fm
+
+# ==========================================
+# 解決 Matplotlib 中文亂碼 (全平台通用 + 雲端修正版)
+# ==========================================
+def set_chinese_font():
+    # 1. 第一優先：尋找專案目錄下的 "font.ttf" (這是給 Streamlit Cloud 用的)
+    font_path = "font.ttf" 
+    if os.path.exists(font_path):
+        # 動態加入字型
+        fm.fontManager.addfont(font_path)
+        # 設定為預設字型
+        plt.rcParams['font.family'] = fm.FontProperties(fname=font_path).get_name()
+        return # 成功就結束
+    
+    # 2. 第二優先：如果是 Windows/Mac 本機開發，嘗試系統內建字型
+    system = platform.system()
+    if system == 'Windows':
+        plt.rcParams['font.sans-serif'] = ['Microsoft JhengHei', 'SimHei']
+    elif system == 'Darwin': # Mac
+        plt.rcParams['font.sans-serif'] = ['Arial Unicode MS', 'Heiti TC']
+    else:
+        # Linux (若沒上傳 font.ttf，這裡通常會失敗，變成方框)
+        plt.rcParams['font.sans-serif'] = ['WenQuanYi Zen Hei', 'Droid Sans Fallback']
+
+    plt.rcParams['axes.unicode_minus'] = False # 解決負號顯示問題
+
+# 呼叫設定函式
+set_chinese_font()
+
+
 
 # 解決 Matplotlib 中文亂碼 (Windows/Mac/Linux 通用解法)
 if platform.system() == 'Windows':
@@ -468,4 +500,5 @@ elif selected_tab == TABS[3]:
             <h3>等待指令中...</h3>
             <p>選取後將即時運算並渲染圖表</p>
         </div>
+
         """, unsafe_allow_html=True)
